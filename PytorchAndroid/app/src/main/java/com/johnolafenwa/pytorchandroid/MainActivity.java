@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == cameraRequestCode && resultCode == RESULT_OK){
+        if(requestCode == cameraRequestCode && resultCode == RESULT_OK && data != null){
 //            Intent resultView = new Intent(this,Result.class);
 //            resultView.putExtra("imagedata",data.getExtras());
 
