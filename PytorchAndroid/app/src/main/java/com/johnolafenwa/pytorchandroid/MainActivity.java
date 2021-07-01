@@ -41,12 +41,14 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        classifier = new Classifier(Utils.assetFilePath(this,"mobilenet-v2.pt"));
-
         Button capture = findViewById(R.id.capture);
         Button album = findViewById(R.id.album);
         Button detect = findViewById(R.id.detect);
         final TextView textView = findViewById(R.id.result);
+
+        classifier = new Classifier(Utils.assetFilePath(this,"mobilenet-v2.pt"));
+
+        detect.setEnabled(false);
 
         capture.setOnClickListener(new View.OnClickListener(){
 
@@ -54,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view){
                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(cameraIntent,cameraRequestCode);
-                textView.setText("");
             }
 
 
@@ -66,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
                 Intent albumIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //                albumIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 startActivityForResult(albumIntent, albumRequestCode);
-                textView.setText("");
             }
         });
 
@@ -74,15 +74,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Bitmap bitmap = null;
-
                 //Getting the image from the image view
                 ImageView imageView = (ImageView) findViewById(R.id.ivPreview);
-
                 //Read the image as Bitmap
                 bitmap = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
-//                Log.d("newversion", "size: " + bitmap.getAllocationByteCount());
                 String pred = classifier.predict(bitmap);
-
                 textView.setText(pred);
             }
         });
@@ -129,13 +125,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == cameraRequestCode && resultCode == RESULT_OK){
-
 //            Intent resultView = new Intent(this,Result.class);
 //            resultView.putExtra("imagedata",data.getExtras());
 
             Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
             ImageView ivPreview = findViewById(R.id.ivPreview);
             ivPreview.setImageBitmap(imageBitmap);
+            ((TextView) findViewById(R.id.result)).setText("");
+            findViewById(R.id.detect).setEnabled(true);
 
 //            String pred = classifier.predict(imageBitmap);
 //            resultView.putExtra("pred",pred);
@@ -150,6 +147,8 @@ public class MainActivity extends AppCompatActivity {
 
             ImageView ivPreview = (ImageView) findViewById(R.id.ivPreview);
             ivPreview.setImageBitmap(selectedImage);
+            ((TextView) findViewById(R.id.result)).setText("");
+            findViewById(R.id.detect).setEnabled(true);
         }
     }
 }
